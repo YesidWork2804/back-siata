@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './infrastructure/auth/auth.module';
 import { JwtAuthGuard } from './infrastructure/auth/jwt-auth.guard';
+import { ClientsModule } from './infrastructure/clients/clients.module';
 import { validateEnvironment } from './infrastructure/config/env.validation';
 import { createTypeOrmOptions } from './infrastructure/database/typeorm.config';
 
@@ -20,6 +21,7 @@ import { createTypeOrmOptions } from './infrastructure/database/typeorm.config';
       inject: [ConfigService],
     }),
     AuthModule,
+    ClientsModule,
   ],
   controllers: [AppController],
   providers: [
