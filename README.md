@@ -154,62 +154,47 @@ npm run build
 npm run start:prod
 ```
 
-## 🧭 Endpoints disponibles
+## 🧭 Cómo probar la API
 
-| Método | Ruta | Descripción | Auth |
-|---|---|---|---|
-| `POST` | `/auth/register` | Registra usuario y retorna JWT. | No |
-| `POST` | `/auth/login` | Autentica usuario y retorna JWT. | No |
-| `GET` | `/clients` | Lista clientes. | Sí |
-| `GET` | `/clients/:id` | Consulta cliente por id. | Sí |
-| `POST` | `/clients` | Crea cliente. | Sí |
-| `PATCH` | `/clients/:id` | Actualiza cliente. | Sí |
-| `DELETE` | `/clients/:id` | Elimina cliente. | Sí |
-| `GET` | `/products` | Lista productos. | Sí |
-| `GET` | `/products/:id` | Consulta producto por id. | Sí |
-| `POST` | `/products` | Crea producto. | Sí |
-| `PATCH` | `/products/:id` | Actualiza producto. | Sí |
-| `DELETE` | `/products/:id` | Elimina producto. | Sí |
-| `GET` | `/warehouses` | Lista bodegas terrestres. | Sí |
-| `GET` | `/warehouses/:id` | Consulta bodega por id. | Sí |
-| `POST` | `/warehouses` | Crea bodega. | Sí |
-| `PATCH` | `/warehouses/:id` | Actualiza bodega. | Sí |
-| `DELETE` | `/warehouses/:id` | Elimina bodega. | Sí |
-| `GET` | `/ports` | Lista puertos marítimos. | Sí |
-| `GET` | `/ports/:id` | Consulta puerto por id. | Sí |
-| `POST` | `/ports` | Crea puerto. | Sí |
-| `PATCH` | `/ports/:id` | Actualiza puerto. | Sí |
-| `DELETE` | `/ports/:id` | Elimina puerto. | Sí |
-| `GET` | `/land-shipments` | Lista envíos terrestres. | Sí |
-| `GET` | `/land-shipments/:id` | Consulta envío terrestre por id. | Sí |
-| `POST` | `/land-shipments` | Crea envío terrestre. | Sí |
-| `PATCH` | `/land-shipments/:id` | Actualiza envío terrestre. | Sí |
-| `DELETE` | `/land-shipments/:id` | Elimina envío terrestre. | Sí |
-| `GET` | `/maritime-shipments` | Lista envíos marítimos. | Sí |
-| `GET` | `/maritime-shipments/:id` | Consulta envío marítimo por id. | Sí |
-| `POST` | `/maritime-shipments` | Crea envío marítimo. | Sí |
-| `PATCH` | `/maritime-shipments/:id` | Actualiza envío marítimo. | Sí |
-| `DELETE` | `/maritime-shipments/:id` | Elimina envío marítimo. | Sí |
-| `GET` | `/api/docs` | Documentación Swagger. | No |
+Para probar la API, usa la documentación interactiva de Swagger en:
 
-Para llamar endpoints protegidos se debe enviar:
+```text
+http://localhost:3000/api/docs
+```
+
+**Ejemplos de uso:**
+
+1. **Registrarse y obtener token:**
+   ```bash
+   POST /auth/register
+   Body: { "email": "user@example.com", "password": "secure123" }
+   ```
+
+2. **Crear un cliente (requiere token):**
+   ```bash
+   POST /clients
+   Headers: Authorization: Bearer <token>
+   Body: { "name": "Empresa XYZ", "address": "Calle 123" }
+   ```
+
+3. **Crear un envío terrestre:**
+   ```bash
+   POST /land-shipments
+   Headers: Authorization: Bearer <token>
+   Body: { "guide_number": "ABC1234567", "quantity": 15, "price": 1000, ... }
+   ```
+
+Los endpoints protegidos requieren el header:
 
 ```http
 Authorization: Bearer <token>
 ```
 
-## 📦 Reglas de negocio implementadas
+## 📦 Reglas de negocio
 
-| Regla | Módulo | Comportamiento |
-|---|---|---|
-| Descuento terrestre 5% | `LandShipments` | Si `quantity > 10`, `discount_price = price * 0.95`; si no, `discount_price = price`. |
-| Descuento marítimo 3% | `MaritimeShipments` | Si `quantity > 10`, `discount_price = price * 0.97`; si no, `discount_price = price`. |
-| Cantidad positiva | Ambos envíos | Si `quantity <= 0`, se lanza `422 UnprocessableEntityException`. |
-| Placa terrestre | `LandShipments` | `vehicle_plate` debe cumplir `ABC123`, regex `/^[A-Z]{3}[0-9]{3}$/`. |
-| Flota marítima | `MaritimeShipments` | `fleet_number` debe cumplir `ABC1234D`, regex `/^[A-Z]{3}[0-9]{4}[A-Z]$/`. |
-| Guía única | Ambos envíos | `guide_number` debe tener 10 caracteres alfanuméricos y no existir en base de datos. Si existe, retorna `422`. |
-
-Decisión técnica: las reglas dependientes del negocio se validan en servicios, no solo en DTOs. Los DTOs validan forma básica del request; los servicios validan reglas que requieren contexto o consulta a base de datos.
+- **Descuentos por cantidad:** Envíos terrestres con `quantity > 10` tienen 5% de descuento; marítimos con `quantity > 10` tienen 3%.
+- **Validaciones:** Cantidad debe ser positiva, placas terrestres formato `ABC123`, flotas marítimas formato `ABC1234D`.
+- **Guía única:** Cada envío debe tener un número de guía único de 10 caracteres alfanuméricos.
 
 ## 🗺️ Diagrama E-R
 
@@ -280,9 +265,3 @@ Docker se eligió para que el entorno sea reproducible. El `Dockerfile` multi-st
 JWT se eligió porque permite autenticación stateless: el servidor no necesita guardar sesión por usuario. Cada request protegido lleva el token Bearer, el guard lo valida y Nest permite o rechaza el acceso.
 
 Swagger/OpenAPI se eligió porque convierte la API en un contrato visible y testeable. Frontend, QA y otros consumidores pueden entender rutas, payloads y respuestas sin leer el código fuente.
-
-## 👤 Autor y repositorio
-
-Autor: Yesid
-
-Repositorio: agrega aquí el link del repositorio cuando esté publicado.
