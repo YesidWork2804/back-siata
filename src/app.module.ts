@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './infrastructure/auth/jwt-auth.guard';
 import { ClientsModule } from './infrastructure/clients/clients.module';
 import { validateEnvironment } from './infrastructure/config/env.validation';
 import { createTypeOrmOptions } from './infrastructure/database/typeorm.config';
+import { PortsModule } from './infrastructure/ports/ports.module';
 import { ProductsModule } from './infrastructure/products/products.module';
 import { WarehousesModule } from './infrastructure/warehouses/warehouses.module';
 
@@ -26,6 +27,7 @@ import { WarehousesModule } from './infrastructure/warehouses/warehouses.module'
     ClientsModule,
     ProductsModule,
     WarehousesModule,
+    PortsModule,
   ],
   controllers: [AppController],
   providers: [
