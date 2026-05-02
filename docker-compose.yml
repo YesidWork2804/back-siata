@@ -1,0 +1,44 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PORT: ${PORT:-3000}
+    container_name: siata-api
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-siata}
+      DB_USER: ${DB_USER:-siata_user}
+      DB_PASSWORD: ${DB_PASSWORD:-siata_password}
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      PORT: ${PORT:-3000}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8
+    container_name: siata-db
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-siata}
+      MYSQL_USER: ${DB_USER:-siata_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-siata_password}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-siata_password}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
